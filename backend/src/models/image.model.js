@@ -1,7 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 
 const imageSchema = new Schema({
-    title:{
+    description:{
         type: String,
         required: true,
     },
