@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
+import {Image} from "../models/image.model.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -163,4 +164,22 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged out!"));
 })
 
-export {registerUser, loginUser, logoutUser};
+const getUserProfile = asyncHandler(async (req,res) =>{
+    const {username} = req.params;
+
+    if(!username?.trim()) throw new ApiError(404, "The user does not exist!");
+
+    const user = await User.findOne({username: username}).select("-password -refreshToken");
+
+    if(!user) throw new ApiError(404, "User does not exist!");
+
+    const userObject = user.toObject();
+    const images = await Image.find({owner: user._id});
+
+    userObject["images"] = images;
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, userObject, "User profile details fetched successfully"));
+})
+export {registerUser, loginUser, logoutUser, getUserProfile};
