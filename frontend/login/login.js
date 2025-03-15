@@ -41,7 +41,7 @@ if (loginForm) {
                 // Redirect to profile page
                 setTimeout(() => {
                     window.location.href = '../profile/profile.html';
-                }, 2000);
+                }, 1000);
             } else {
                 // Show error popup
                 showPopup(data.message || 'Login failed', true);
