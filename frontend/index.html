@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoShare - Home</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="logo">PhotoShare</div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="window.location.reload()">Home</a></li>
+                <li><a href="/explore.html">Explore</a></li>
+                <li id="profile-link"><a href="/profile.html">Profile</a></li>
+                <li id="login-link"><a href="./login/login.html">Login</a></li>
+                <li id="logout-link" style="display: none;"><a href="#">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Share Your Moments, Inspire the World</h1>
+            <p>Join the community of photographers and showcase your creativity.</p>
+            <div class="cta-buttons">
+                <button id="cta-button">Get Started</button>
+                <button id="explore-button">Explore Photos</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Why Choose PhotoShare?</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <i class="fas fa-camera"></i>
+                <h3>Upload Photos</h3>
+                <p>Easily upload and share your photos with the world.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-users"></i>
+                <h3>Connect with Creators</h3>
+                <p>Follow and interact with other photographers.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-heart"></i>
+                <h3>Get Inspired</h3>
+                <p>Discover amazing photos and get inspired daily.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">PhotoShare</div>
+            <div class="footer-links">
+                <a href="/about.html">About Us</a>
+                <a href="/contact.html">Contact</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+            </div>
+        </div>
+        <p>&copy; 2023 PhotoShare. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

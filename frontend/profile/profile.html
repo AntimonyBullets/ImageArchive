@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageArchive - Profile</title>
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="logo">ImageArchive</div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../explore.html">Explore</a></li>
+                <li><a href="#" id="logout-link">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Profile Section -->
+    <section class="profile">
+        <div class="profile-info">
+            <img id="profile-avatar" src="" alt="Profile Avatar" class="avatar">
+            <h1 id="profile-fullName"></h1>
+            <p id="profile-username"></p>
+        </div>
+    </section>
+
+    <!-- User's Images Section -->
+    <section class="user-images">
+        <h2>Your Uploads</h2>
+        <div id="image-grid" class="image-grid">
+            <!-- Images will be dynamically inserted here -->
+        </div>
+        <p id="no-images" class="no-images" style="display: none;">No images uploaded yet.</p>
+    </section>
+
+    <script src="profile.js"></script>
+</body>
+</html>
