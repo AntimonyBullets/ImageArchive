@@ -7,7 +7,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const uploadImage = asyncHandler(async (req, res)=>{
     const { description } = req.body;
-    if(!description) throw new ApiError(400, "Please provide some description");
 
     const imageLocalPath = req.file?.path;
 
@@ -17,7 +16,7 @@ const uploadImage = asyncHandler(async (req, res)=>{
     if(!imageFile) throw new ApiError(500, "Some error occurred while uploading the image");
 
     const image = await Image.create({
-        description,
+        description: description || "",
         image: imageFile.url,
         owner: req.user._id
     });
@@ -73,29 +72,23 @@ const getImageById = asyncHandler(async (req,res)=>{
 })
 
 const getRecentImages = asyncHandler(async (req, res) => {
-    // Get query parameters with defaults
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;  // Default to 6 images
+    const limit = 10;
     
-    // Calculate skip for pagination
     const skip = (page - 1) * limit;
     
-    // Fetch recent images, sorted by creation date
     const images = await Image.find()
         .sort({ createdAt: -1 })  // Newest first
         .skip(skip)
         .limit(limit)
         .populate('owner', 'username fullName avatar');
     
-    // Get total count for pagination info
     const totalImages = await Image.countDocuments();
     
-    // Calculate pagination info
     const totalPages = Math.ceil(totalImages / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;
     
-    // Return response
     return res
         .status(200)
         .json(

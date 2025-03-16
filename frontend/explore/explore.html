@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore | ImageArchive</title>
+    <link rel="stylesheet" href="explore.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ImageArchive</h1>
+            </div>
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search by username">
+                    <button id="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="explore.html" class="active">Explore</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="explore-section">
+                <div class="section-header">
+                    <h2>Explore Recent Images</h2>
+                </div>
+                
+                <div id="image-grid" class="image-grid">
+                    <!-- Images will be loaded here dynamically -->
+                </div>
+
+                <div id="scroll-loader" class="scroll-loader">
+                    <div class="spinner"></div>
+                    <p>Loading more images...</p>
+                </div>
+
+                <div id="no-more-images" class="no-more-images" style="display: none;">
+                    <p>No more images to load</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 ImageArchive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="explore.js"></script>
+</body>
+</html>

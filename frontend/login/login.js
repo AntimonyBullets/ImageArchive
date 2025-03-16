@@ -30,10 +30,11 @@ if (loginForm) {
             });
 
             const data = await response.json();
-
+            console.log(data)
             if (response.ok) {
                 // Store user data in localStorage
                 localStorage.setItem('userData', JSON.stringify(data.data.user));
+                localStorage.setItem('Data', JSON.stringify(data.data));
 
                 // Show success popup
                 showPopup('Login successful! Redirecting...', false);

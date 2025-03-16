@@ -122,7 +122,8 @@ const loginUser = asyncHandler(async (req, res) => {
     //the following object is passed as parameter in res.cookie()
     const options = {
         httpOnly: true, //Ensures the cookie is only accessible via HTTP(S) requests and not accessible to client-side JavaScript.
-        secure: true //Ensures the cookie is only sent over secure HTTPS connections.
+        secure: false, //Ensures the cookie is only sent over secure HTTPS connections. (we have temparirily set it to false because we are using localhost)
+        sameSite: "none"
     }
 
     return res

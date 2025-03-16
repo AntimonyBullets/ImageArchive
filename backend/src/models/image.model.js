@@ -3,7 +3,6 @@ import mongoose, {Schema} from "mongoose";
 const imageSchema = new Schema({
     description:{
         type: String,
-        required: true,
     },
     owner:{
         type: Schema.Types.ObjectId,

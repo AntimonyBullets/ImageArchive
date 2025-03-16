@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile | ImageArchive</title>
-    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="otherProfile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
     <header>
         <div class="container">
             <div class="logo">
@@ -24,9 +28,8 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="profile.html">Home</a></li>
+                    <li><a href="../profile/profile.html">Home</a></li>
                     <li><a href="../explore/explore.html">Explore</a></li>
-                    <li><a href="#" id="logout-link">Logout</a></li>
                 </ul>
             </nav>
         </div>
@@ -34,10 +37,6 @@
 
     <main>
         <div class="container">
-            <div id="loading-spinner">
-                <div class="spinner"></div>
-            </div>
-
             <section class="profile-section">
                 <div class="profile-header">
                     <div class="profile-avatar-container">
@@ -46,23 +45,18 @@
                     <div class="profile-info">
                         <h2 id="profile-fullName">Loading...</h2>
                         <p id="profile-username">@loading...</p>
-                        <button class="edit-profile-btn">Edit Profile</button>
                     </div>
                 </div>
             </section>
 
             <section class="gallery-section">
                 <div class="section-header">
-                    <h3>My Images</h3>
-                    <a class="upload-btn">
-                        <i class="fas fa-plus"></i> Upload New
-                    </a>
+                    <h3>Images</h3>
                 </div>
                 
                 <div id="no-images" class="no-content-message">
                     <i class="fas fa-images"></i>
-                    <p>You haven't uploaded any images yet.</p>
-                    <a class="btn-primary">Upload Your First Image</a>
+                    <p>No images uploaded yet.</p>
                 </div>
                 
                 <div id="image-grid" class="image-grid">
@@ -78,6 +72,6 @@
         </div>
     </footer>
 
-    <script src="profile.js"></script>
+    <script src="otherProfile.js"></script>
 </body>
 </html>

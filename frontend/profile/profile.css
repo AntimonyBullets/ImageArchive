@@ -1,209 +1,478 @@
-/* General Styles */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
-    line-height: 1.6;
+/* Base Styles */
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --secondary-color: #2c3e50;
+    --light-color: #ecf0f1;
+    --gray-color: #95a5a6;
+    --danger-color: #e74c3c;
+    --success-color: #2ecc71;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
 }
 
-/* Header Section */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+button {
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Header Styles */
 header {
+    background-color: white;
+    box-shadow: var(--box-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    padding: 15px 20px;
 }
 
-header .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #007bff;
+.logo h1 {
+    color: var(--primary-color);
+    font-size: 24px;
+    font-weight: 700;
 }
 
 nav ul {
-    list-style: none;
     display: flex;
-    gap: 1.5rem;
-    margin: 0;
-    padding: 0;
+    list-style: none;
+}
+
+nav ul li {
+    margin-left: 25px;
 }
 
 nav ul li a {
+    color: var(--secondary-color);
     font-weight: 500;
-    color: #333;
-    text-decoration: none;
-    transition: color 0.2s ease;
+    padding: 5px 0;
+    position: relative;
 }
 
-nav ul li a:hover {
-    color: #007bff;
+nav ul li a:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    bottom: 0;
+    left: 0;
+    transition: var(--transition);
+}
+
+nav ul li a:hover:after,
+nav ul li a.active:after {
+    width: 100%;
+}
+
+nav ul li a.active {
+    color: var(--primary-color);
+}
+
+/* Main Content */
+main {
+    padding: 40px 0;
+    min-height: calc(100vh - 140px);
+}
+
+/* Loading Spinner */
+#loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(52, 152, 219, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Profile Section */
-.profile {
-    text-align: center;
-    padding: 2rem;
-    background-color: #fff;
-    margin: 2rem auto;
-    max-width: 800px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
+.profile-section {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 30px;
+    margin-bottom: 30px;
 }
 
-.profile:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.profile-avatar-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary-color);
+}
+
+#profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .profile-info {
-    margin-bottom: 2rem;
+    flex: 1;
 }
 
-.avatar {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    border: 4px solid #007bff;
-    transition: transform 0.3s ease;
+#profile-fullName {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: var(--secondary-color);
 }
 
-.avatar:hover {
-    transform: scale(1.05);
+#profile-username {
+    color: var(--gray-color);
+    font-size: 16px;
+    margin-bottom: 15px;
 }
 
-.profile-info h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.profile-info p {
-    font-size: 1.25rem;
-    color: #555;
-    margin-bottom: 1rem;
-}
-
-/* Upload Image Button */
-.upload-button {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #007bff;
+.edit-profile-btn {
+    background-color: var(--primary-color);
+    color: white;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: var(--transition);
 }
 
-.upload-button:hover {
-    background-color: #0056b3;
+.edit-profile-btn:hover {
+    background-color: var(--primary-dark);
     transform: translateY(-2px);
 }
 
-/* User's Images Section */
-.user-images {
-    padding: 2rem;
-    background-color: #fff;
-    margin: 2rem auto;
-    max-width: 1200px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
+/* Gallery Section */
+.gallery-section {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 30px;
 }
 
-.user-images:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
 }
 
-.user-images h2 {
-    font-size: 1.75rem;
-    margin-bottom: 1.5rem;
-    color: #007bff;
+.section-header h3 {
+    color: var(--secondary-color);
+    font-size: 20px;
+}
+
+.upload-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.upload-btn:hover {
+    background-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.no-content-message {
     text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-color);
 }
 
+.no-content-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.no-content-message p {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Image Grid */
 .image-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 3 images per line */
-    gap: 1.5rem;
-    padding: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
 }
 
 .image-container {
     position: relative;
-    width: 100%;
-    height: 300px; /* Fixed height */
+    border-radius: var(--border-radius);
     overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    aspect-ratio: 1/1;
 }
 
 .image-container:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .delete-icon {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: rgba(255, 0, 0, 0.8);
-    color: white;
-    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.1s ease;
-}
-
-.image-container:hover .delete-icon {
-    opacity: 1; /* Fade in on hover */
-}
-
-/* No Images Message */
-.no-images {
-    text-align: center;
-    font-size: 1.25rem;
-    color: #555;
-    margin-top: 1rem;
-}
-
-/* Loading Spinner */
-.loading-spinner {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    font-size: 1.5rem;
-    color: #007bff;
+    cursor: pointer;
+    opacity: 0;
+    transition: var(--transition);
+    color: var(--danger-color);
+}
+
+.image-container:hover .delete-icon {
+    opacity: 1;
+}
+
+.delete-icon:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Footer */
+footer {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
     .image-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    nav ul li {
+        margin-left: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    header .container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    nav ul {
+        justify-content: center;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+}
+.loading-images-message {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.image-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(52, 152, 219, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+/* Add these new styles to your existing CSS */
+
+/* Search Container Styles */
+.search-container {
+    display: flex;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #f5f7fa;
+    border-radius: 20px;
+    padding: 5px 15px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+    background-color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-box input {
+    background: none;
+    border: none;
+    padding: 8px;
+    width: 200px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+.search-box input:focus {
+    outline: none;
+}
+
+.search-box input::placeholder {
+    color: #95a5a6;
+}
+
+.search-box button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.search-box button:hover {
+    color: var(--primary-dark);
+}
+
+/* Update existing header styles to accommodate search box */
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+/* Responsive styles for search box */
+@media (max-width: 768px) {
+    header .container {
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
-    .profile, .user-images {
-        margin: 1rem;
-        padding: 1rem;
+    .search-container {
+        order: 3;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .search-box input {
+        width: 100%;
     }
 }
