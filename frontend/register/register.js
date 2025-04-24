@@ -32,8 +32,7 @@ if (submitButton) {
         try {
             const response = await fetch(`${API_BASE_URL}/users/register`, {
                 method: 'POST',
-                body: formData, // Send FormData directly
-                credentials: 'include'
+                body: formData // Send FormData directly
             });
 
             console.log('Response status:', response.status); // Debugging line

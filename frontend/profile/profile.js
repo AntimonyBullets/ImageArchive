@@ -100,45 +100,20 @@ const handleFileUpload = async (file) => {
 };
 const fetchUserProfile = async () => {
     try {
-        toggleLoadingSpinner(true); // Show loading spinner
-
-        // Retry logic for retrieving user data
-        let userData = null;
-        let retryCount = 0;
-        const maxRetries = 3;
+        toggleLoadingSpinner(true);
         
-        while (!userData && retryCount < maxRetries) {
-            userData = JSON.parse(localStorage.getItem('userData'));
-            if (!userData) {
-                console.log(`Attempt ${retryCount + 1}: User data not found in localStorage, retrying...`);
-                retryCount++;
-                // Wait 200ms before retrying
-                await new Promise(resolve => setTimeout(resolve, 200));
-            }
-        }
-        
-        // Get auth data
         const authData = await getAuthData();
-        console.log("Auth Data:", authData);
-        
-        if (!userData) {
-            console.error('User data not found in localStorage after multiple attempts');
-            alert('Unable to load profile. Please try logging in again.');
+        if (!authData) {
+            console.error('User data not found in localStorage');
             window.location.href = '../login/login.html';
             return;
         }
 
-        const username = userData.username;
-        console.log('Fetching profile for username:', username); // Debugging line
-
-        // Fetch the user's profile data
-        const response = await fetch(`${API_BASE_URL}/users/${username}`, {
-            credentials: 'include',
+        const response = await fetch(`${API_BASE_URL}/users/${authData.user.username}`, {
             headers: {
                 "Authorization": `Bearer ${authData.accessToken}`
             }
         });
-        console.log(response);
 
         if (response.ok) {
             const rawProfileData = await response.json();
@@ -248,7 +223,6 @@ const fetchUserProfile = async () => {
                                 // Send delete request to the API
                                 const deleteResponse = await fetch(`${API_BASE_URL}/images/${image._id}`, {
                                     method: 'DELETE',
-                                    credentials: 'include',
                                     headers: {
                                         "Authorization": `Bearer ${authData.accessToken}`,
                                     }
@@ -324,9 +298,8 @@ if (logoutLink) {
             
             const response = await fetch(`${API_BASE_URL}/users/logout`, {
                 method: 'POST',
-                credentials: 'include',
                 headers: {
-                    "Authorization" : `Bearer ${authData.accessToken}`
+                    "Authorization": `Bearer ${authData.accessToken}`
                 }
             });
             if (response.ok) {

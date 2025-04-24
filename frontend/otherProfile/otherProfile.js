@@ -27,7 +27,6 @@ const fetchUserProfile = async (username) => {
         }
 
         const response = await fetch(`${API_BASE_URL}/users/${username}`, {
-            credentials: 'include',
             headers: {
                 "Authorization": `Bearer ${Data.accessToken}`
             }
@@ -119,25 +118,24 @@ const handleSearch = () => {
     });
 };
 
-// Logout functionality
-const logoutLink = document.getElementById('logout-link');
-if (logoutLink) {
-    logoutLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch(`${API_BASE_URL}/users/logout`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-            if (response.ok) {
-                localStorage.removeItem('Data');
-                window.location.href = '../index.html';
+// Update logout function
+const logout = async () => {
+    try {
+        const Data = JSON.parse(localStorage.getItem('Data'));
+        const response = await fetch(`${API_BASE_URL}/users/logout`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${Data.accessToken}`
             }
-        } catch (error) {
-            console.error('Error logging out:', error);
+        });
+        if (response.ok) {
+            localStorage.removeItem('Data');
+            window.location.href = '../index.html';
         }
-    });
-}
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
