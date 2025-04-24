@@ -17,51 +17,6 @@ let imagesCache = []; // Cache for preloaded images
 const IMAGES_PER_PAGE = 12; // Number of images to load per batch
 const PRELOAD_THRESHOLD = 0.5; // Preload when 50% of the way through current images
 
-// Image loading optimization
-const imageLoadingQueue = [];
-let isProcessingQueue = false;
-
-const processImageQueue = async () => {
-    if (isProcessingQueue || imageLoadingQueue.length === 0) return;
-    
-    isProcessingQueue = true;
-    const BATCH_SIZE = 3; // Load 3 images at a time
-    
-    while (imageLoadingQueue.length > 0) {
-        const batch = imageLoadingQueue.splice(0, BATCH_SIZE);
-        await Promise.all(batch.map(async ({ img, src }) => {
-            try {
-                // Create a low-quality placeholder
-                const canvas = document.createElement('canvas');
-                canvas.width = 50;
-                canvas.height = 50;
-                img.style.filter = 'blur(10px)';
-                img.src = canvas.toDataURL();
-
-                // Load the actual image
-                await new Promise((resolve, reject) => {
-                    const tempImg = new Image();
-                    tempImg.onload = () => {
-                        img.src = src;
-                        img.style.filter = 'none';
-                        resolve();
-                    };
-                    tempImg.onerror = reject;
-                    tempImg.src = src;
-                });
-            } catch (error) {
-                console.error('Error loading image:', error);
-                img.src = '../assets/image-error.png';
-            }
-        }));
-        
-        // Small delay between batches to prevent overwhelming the browser
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    isProcessingQueue = false;
-};
-
 // Get auth data with retry mechanism
 const getAuthData = async () => {
     let authData = JSON.parse(localStorage.getItem('Data'));
@@ -86,11 +41,22 @@ const createImageElement = (imageData) => {
     const img = document.createElement('img');
     img.loading = 'lazy'; // Use native lazy loading
     img.alt = imageData.description || 'User upload';
-    img.className = 'image-transition'; // Add class for smooth transition
     
-    // Add to loading queue instead of setting src directly
-    imageLoadingQueue.push({ img, src: imageData.image });
-    processImageQueue();
+    // Add placeholder while image loads
+    img.style.backgroundColor = '#f0f0f0';
+    
+    // Set up intersection observer for each image
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Only set the src when the image is about to enter the viewport
+                img.src = imageData.image;
+                observer.disconnect();
+            }
+        });
+    }, { rootMargin: '200px' }); // Load when within 200px of viewport
+    
+    observer.observe(img);
 
     const imageInfo = document.createElement('div');
     imageInfo.className = 'image-info';
@@ -116,15 +82,20 @@ const createImageElement = (imageData) => {
     return imageContainer;
 };
 
-// Intersection Observer for infinite scroll
-const createIntersectionObserver = () => {
-    return new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !isLoading) {
-                fetchRecentImages();
-            }
-        });
-    }, { rootMargin: '200px' });
+// Function to render images from cache to DOM
+const renderImages = (startIdx, count) => {
+    const imageGrid = document.getElementById('image-grid');
+    const fragment = document.createDocumentFragment(); // Use document fragment for better performance
+    
+    const endIdx = Math.min(startIdx + count, imagesCache.length);
+    
+    for (let i = startIdx; i < endIdx; i++) {
+        const imageElement = createImageElement(imagesCache[i]);
+        fragment.appendChild(imageElement);
+    }
+    
+    imageGrid.appendChild(fragment);
+    return endIdx - startIdx; // Return number of images rendered
 };
 
 // Function to fetch recent images
@@ -163,23 +134,15 @@ const fetchRecentImages = async (silent = false) => {
             return;
         }
 
-        const imageGrid = document.getElementById('image-grid');
-        const fragment = document.createDocumentFragment();
-
-        images.forEach(imageData => {
-            const imageElement = createImageElement(imageData);
-            fragment.appendChild(imageElement);
-        });
-
-        imageGrid.appendChild(fragment);
-        page++;
-
-        // Set up intersection observer for the last image
-        const observer = createIntersectionObserver();
-        const lastImage = imageGrid.lastElementChild;
-        if (lastImage) {
-            observer.observe(lastImage);
+        // Add new images to cache
+        imagesCache = imagesCache.concat(images);
+        
+        // If this is the first page, render immediately
+        if (page === 1) {
+            renderImages(0, images.length);
         }
+
+        page++;
 
     } catch (error) {
         console.error('Error:', error);
@@ -189,7 +152,37 @@ const fetchRecentImages = async (silent = false) => {
     }
 };
 
-// Handle search functionality
+// Optimized infinite scroll handler with debounce
+let scrollTimeout;
+const handleScroll = () => {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    
+    scrollTimeout = setTimeout(() => {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        const scrollPosition = scrollTop + clientHeight;
+        const totalHeight = scrollHeight;
+        
+        // Calculate how far through the content we've scrolled (0 to 1)
+        const scrollPercentage = scrollPosition / totalHeight;
+        
+        // If we're near the bottom, render more images from cache and possibly fetch more
+        if (scrollPercentage > 0.7 && !isLoading) {
+            const currentCount = document.querySelectorAll('.image-container').length;
+            
+            // If we have cached images that aren't rendered yet, render them
+            if (currentCount < imagesCache.length) {
+                renderImages(currentCount, IMAGES_PER_PAGE);
+            }
+            
+            // If we're running low on cached images, fetch more
+            if (currentCount >= imagesCache.length * PRELOAD_THRESHOLD && hasMore) {
+                fetchRecentImages(true); // Silent fetch (don't show loader)
+            }
+        }
+    }, 100); // 100ms debounce
+};
+
+// Search functionality with optimized auth data retrieval
 const handleSearch = () => {
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
@@ -250,21 +243,23 @@ if (logoutLink) {
     });
 }
 
-// Initialize
+// Initialize with optimized event listeners
 document.addEventListener('DOMContentLoaded', () => {
-    // Add CSS for image transitions
-    const style = document.createElement('style');
-    style.textContent = `
-        .image-transition {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
-        }
-        .image-transition.loaded {
-            opacity: 1;
-        }
-    `;
-    document.head.appendChild(style);
-
+    // Initial fetch
     fetchRecentImages();
+    
+    // Set up search
     handleSearch();
+    
+    // Use passive event listener for better scroll performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Prefetch next page when idle
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            if (page === 2 && hasMore && !isLoading) {
+                fetchRecentImages(true);
+            }
+        });
+    }
 });
