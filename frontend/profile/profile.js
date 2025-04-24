@@ -1,3 +1,6 @@
+// Import the API base URL from config
+import { API_BASE_URL } from '../config.js';
+
 // Function to show/hide loading spinner
 const toggleLoadingSpinner = (show) => {
     const loadingSpinner = document.getElementById('loading-spinner');
@@ -80,7 +83,7 @@ const handleFileUpload = async (file) => {
             return;
         }
         
-        const response = await fetch('http://localhost:5000/api/v1/images/upload', {
+        const response = await fetch(`${API_BASE_URL}/images/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authData.accessToken}`
@@ -129,7 +132,7 @@ const fetchUserProfile = async () => {
         console.log('Fetching profile for username:', username); // Debugging line
 
         // Fetch the user's profile data
-        const response = await fetch(`http://localhost:5000/api/v1/users/${username}`, {
+        const response = await fetch(`${API_BASE_URL}/users/${username}`, {
             credentials: 'include',
             headers: {
                 "Authorization": `Bearer ${authData.accessToken}`
@@ -243,7 +246,7 @@ const fetchUserProfile = async () => {
                                 }
                                 
                                 // Send delete request to the API
-                                const deleteResponse = await fetch(`http://localhost:5000/api/v1/images/${image._id}`, {
+                                const deleteResponse = await fetch(`${API_BASE_URL}/images/${image._id}`, {
                                     method: 'DELETE',
                                     credentials: 'include',
                                     headers: {
@@ -319,7 +322,7 @@ if (logoutLink) {
                 return;
             }
             
-            const response = await fetch('http://localhost:5000/api/v1/users/logout', {
+            const response = await fetch(`${API_BASE_URL}/users/logout`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

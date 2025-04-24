@@ -1,3 +1,6 @@
+// Import the API base URL from config
+import { API_BASE_URL } from '../config.js';
+
 // Function to show/hide loading spinner
 const toggleLoadingSpinner = (show) => {
     const loadingSpinner = document.getElementById('loading-spinner');
@@ -111,7 +114,7 @@ const fetchRecentImages = async (silent = false) => {
             throw new Error('User data not found');
         }
 
-        const response = await fetch(`http://localhost:5000/api/v1/images/recent?page=${page}&limit=${IMAGES_PER_PAGE}`, {
+        const response = await fetch(`${API_BASE_URL}/images/recent?page=${page}&limit=${IMAGES_PER_PAGE}`, {
             headers: {
                 'Authorization': `Bearer ${authData.accessToken}`
             }
@@ -222,7 +225,7 @@ if (logoutLink) {
                 return;
             }
             
-            const response = await fetch('http://localhost:5000/api/v1/users/logout', {
+            const response = await fetch(`${API_BASE_URL}/users/logout`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

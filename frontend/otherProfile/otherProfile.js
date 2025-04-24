@@ -1,3 +1,6 @@
+// Import the API base URL from config
+import { API_BASE_URL } from '../config.js';
+
 // Function to show/hide loading spinner
 const toggleLoadingSpinner = (show) => {
     const loadingSpinner = document.getElementById('loading-spinner');
@@ -23,9 +26,10 @@ const fetchUserProfile = async (username) => {
             return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/v1/users/${username}`, {
+        const response = await fetch(`${API_BASE_URL}/users/${username}`, {
+            credentials: 'include',
             headers: {
-                'Authorization': `Bearer ${Data.accessToken}`
+                "Authorization": `Bearer ${Data.accessToken}`
             }
         });
 
@@ -121,7 +125,7 @@ if (logoutLink) {
     logoutLink.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/api/v1/users/logout', {
+            const response = await fetch(`${API_BASE_URL}/users/logout`, {
                 method: 'POST',
                 credentials: 'include'
             });

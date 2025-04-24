@@ -1,3 +1,6 @@
+// Import the API base URL from config
+import { API_BASE_URL } from '../config.js';
+
 // Function to show a popup message
 const showPopup = (message, isError = false) => {
     console.log('Showing popup:', message); // Debugging line
@@ -27,7 +30,7 @@ if (submitButton) {
         formData.append('avatar', document.getElementById('avatar').files[0]);
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/users/register', {
+            const response = await fetch(`${API_BASE_URL}/users/register`, {
                 method: 'POST',
                 body: formData, // Send FormData directly
                 credentials: 'include'
