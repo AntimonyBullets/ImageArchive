@@ -98,6 +98,125 @@ const handleFileUpload = async (file) => {
         console.error('Error uploading image:', error);
     }
 };
+
+// Image loading optimization
+const imageLoadingQueue = [];
+let isProcessingQueue = false;
+
+const processImageQueue = async () => {
+    if (isProcessingQueue || imageLoadingQueue.length === 0) return;
+    
+    isProcessingQueue = true;
+    const BATCH_SIZE = 3; // Load 3 images at a time
+    
+    while (imageLoadingQueue.length > 0) {
+        const batch = imageLoadingQueue.splice(0, BATCH_SIZE);
+        await Promise.all(batch.map(async ({ img, src }) => {
+            try {
+                // Create a low-quality placeholder
+                const canvas = document.createElement('canvas');
+                canvas.width = 50;
+                canvas.height = 50;
+                img.style.filter = 'blur(10px)';
+                img.src = canvas.toDataURL();
+
+                // Load the actual image
+                await new Promise((resolve, reject) => {
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        img.src = src;
+                        img.style.filter = 'none';
+                        img.classList.add('loaded');
+                        resolve();
+                    };
+                    tempImg.onerror = reject;
+                    tempImg.src = src;
+                });
+            } catch (error) {
+                console.error('Error loading image:', error);
+                img.src = '../assets/image-error.png';
+            }
+        }));
+        
+        // Small delay between batches to prevent overwhelming the browser
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    isProcessingQueue = false;
+};
+
+// Function to create image element with optimized loading
+const createImageElement = (image) => {
+    const imageContainer = document.createElement('div');
+    imageContainer.className = 'image-container';
+    imageContainer.style.display = 'none'; // Hide initially
+    
+    const imgElement = document.createElement('img');
+    imgElement.className = 'image-transition';
+    imgElement.alt = image.description || 'User upload';
+    imgElement.loading = 'lazy'; // Use native lazy loading
+
+    // Add to loading queue instead of setting src directly
+    imageLoadingQueue.push({ img: imgElement, src: image.image });
+    
+    // Create delete icon
+    const deleteIcon = document.createElement('div');
+    deleteIcon.className = 'delete-icon';
+    deleteIcon.innerHTML = '<i class="fas fa-trash"></i>';
+    
+    // Add click event listener to delete icon
+    deleteIcon.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (confirm('Are you sure you want to delete this image?')) {
+            try {
+                toggleLoadingSpinner(true);
+                const authData = await getAuthData();
+                if (!authData) {
+                    alert('Unable to delete image. Please try logging in again.');
+                    return;
+                }
+                
+                const deleteResponse = await fetch(`${API_BASE_URL}/images/${image._id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        "Authorization": `Bearer ${authData.accessToken}`
+                    }
+                });
+
+                if (deleteResponse.ok) {
+                    imageContainer.remove();
+                    if (document.querySelectorAll('.image-container').length === 0) {
+                        document.getElementById('no-images').style.display = 'block';
+                    }
+                    alert('Image deleted successfully!');
+                } else {
+                    const errorData = await deleteResponse.json();
+                    alert(`Failed to delete image: ${errorData.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error deleting image:', error);
+                alert('An error occurred while deleting the image.');
+            } finally {
+                toggleLoadingSpinner(false);
+            }
+        }
+    });
+
+    // Make the image clickable to view full size
+    imageContainer.addEventListener('click', () => {
+        window.open(image.image, '_blank');
+    });
+
+    // Show container when image is loaded
+    imgElement.addEventListener('load', () => {
+        imageContainer.style.display = 'block';
+    });
+
+    imageContainer.appendChild(imgElement);
+    imageContainer.appendChild(deleteIcon);
+    return imageContainer;
+};
+
 const fetchUserProfile = async () => {
     try {
         toggleLoadingSpinner(true);
@@ -150,119 +269,7 @@ const fetchUserProfile = async () => {
                 const totalImages = profileData.images.length;
                 
                 profileData.images.forEach(image => {
-                    // Create image container
-                    const imageContainer = document.createElement('div');
-                    imageContainer.className = 'image-container';
-                    imageContainer.style.display = 'none'; // Hide initially
-                    
-                    // Create image element
-                    const imgElement = document.createElement('img');
-                    imgElement.src = image.image;
-                    imgElement.alt = image.description || 'User upload';
-                    imgElement.loading = 'lazy'; // Add lazy loading for better performance
-                    
-                    // Add load event listener to track when image is loaded
-                    imgElement.addEventListener('load', () => {
-                        imagesLoaded++;
-                        
-                        // Update loading message
-                        const loadingMessageElement = document.querySelector('.loading-images-message p');
-                        if (loadingMessageElement) {
-                            loadingMessageElement.textContent = `Loading ${totalImages - imagesLoaded} of ${totalImages} images...`;
-                        }
-                        
-                        // Show this image container
-                        imageContainer.style.display = 'block';
-                        
-                        // If all images are loaded, remove the loading message
-                        if (imagesLoaded === totalImages) {
-                            const loadingMessage = document.querySelector('.loading-images-message');
-                            if (loadingMessage) {
-                                loadingMessage.remove();
-                            }
-                        }
-                    });
-                    
-                    // Add error event listener
-                    imgElement.addEventListener('error', () => {
-                        imagesLoaded++;
-                        imageContainer.style.display = 'block';
-                        imgElement.src = '../assets/image-error.png'; // Replace with your error image
-                        imgElement.alt = 'Image failed to load';
-                        
-                        // If all images are loaded (or failed), remove the loading message
-                        if (imagesLoaded === totalImages) {
-                            const loadingMessage = document.querySelector('.loading-images-message');
-                            if (loadingMessage) {
-                                loadingMessage.remove();
-                            }
-                        }
-                    });
-
-                    // Create delete icon
-                    const deleteIcon = document.createElement('div');
-                    deleteIcon.className = 'delete-icon';
-                    deleteIcon.innerHTML = '<i class="fas fa-trash"></i>'; // Font Awesome trash icon
-                    
-                    // Add click event listener to delete icon
-                    deleteIcon.addEventListener('click', async (e) => {
-                        e.stopPropagation(); // Prevent image click event
-                        
-                        // Confirm before deleting
-                        if (confirm('Are you sure you want to delete this image?')) {
-                            try {
-                                toggleLoadingSpinner(true); // Show loading spinner
-                                
-                                const authData = await getAuthData();
-                                
-                                if (!authData) {
-                                    alert('Unable to delete image. Please try logging in again.');
-                                    return;
-                                }
-                                
-                                // Send delete request to the API
-                                const deleteResponse = await fetch(`${API_BASE_URL}/images/${image._id}`, {
-                                    method: 'DELETE',
-                                    headers: {
-                                        "Authorization": `Bearer ${authData.accessToken}`,
-                                    }
-                                });
-                                console.log(deleteResponse);
-                                if (deleteResponse.ok) {
-                                    // If successful, remove the image from the UI
-                                    imageContainer.remove();
-                                    
-                                    // Check if there are no more images
-                                    if (imageGrid.children.length === 0 || 
-                                        (imageGrid.children.length === 1 && imageGrid.children[0].className === 'loading-images-message')) {
-                                        noImagesMessage.style.display = 'block'; // Show the "No images" message
-                                    }
-                                    
-                                    // Show success message
-                                    alert('Image deleted successfully!');
-                                } else {
-                                    // Handle error response
-                                    const errorData = await deleteResponse.json();
-                                    console.error('Error deleting image:', errorData);
-                                    alert(`Failed to delete image: ${errorData.message || 'Unknown error'}`);
-                                }
-                            } catch (error) {
-                                console.error('Error deleting image:', error);
-                                alert('An error occurred while deleting the image. Please try again.');
-                            } finally {
-                                toggleLoadingSpinner(false); // Hide loading spinner
-                            }
-                        }
-                    });
-
-                    // Make the image clickable to view full size
-                    imageContainer.addEventListener('click', () => {
-                        window.open(image.image, '_blank');
-                    });
-
-                    // Append elements to container
-                    imageContainer.appendChild(imgElement);
-                    imageContainer.appendChild(deleteIcon);
+                    const imageContainer = createImageElement(image);
                     imageGrid.appendChild(imageContainer);
                 });
                 
@@ -328,6 +335,18 @@ if (editProfileBtn) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // Add CSS for image transitions
+    const style = document.createElement('style');
+    style.textContent = `
+        .image-transition {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
+        }
+        .image-transition.loaded {
+            opacity: 1;
+        }
+    `;
+    document.head.appendChild(style);
 
     handleSearch();
     const fileInput = document.createElement('input');
@@ -336,7 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fileInput.style.display = 'none';
     document.body.appendChild(fileInput);
 
-    // Add click handler to upload button
     const uploadBtn = document.querySelector('.upload-btn');
     if (uploadBtn) {
         uploadBtn.addEventListener('click', () => {
@@ -344,12 +362,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle file selection
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
             handleFileUpload(file);
         }
     });
+
+    // Start processing the image queue
+    setInterval(() => {
+        if (!isProcessingQueue) {
+            processImageQueue();
+        }
+    }, 200);
+
     fetchUserProfile();
 });
