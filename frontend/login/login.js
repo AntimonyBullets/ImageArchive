@@ -1,3 +1,6 @@
+// Import the API base URL from config
+import { API_BASE_URL } from '../config.js';
+
 // Function to show a popup message
 const showPopup = (message, isError = false) => {
     const popup = document.createElement('div');
@@ -20,7 +23,7 @@ if (loginForm) {
         const password = document.getElementById('password').value;
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/users/login', {
+            const response = await fetch(`${API_BASE_URL}/users/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
